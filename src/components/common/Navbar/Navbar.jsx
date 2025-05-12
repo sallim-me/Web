@@ -14,7 +14,7 @@ const Navbar = () => {
 
   const tabs = [
     { path: "/chat", iconOn: chatOn, iconOff: chatOff, label: "채팅" },
-    { path: "/post", iconOn: postOn, iconOff: postOff, label: "게시판" },
+    { path: "/post/list", iconOn: postOn, iconOff: postOff, label: "게시판" },
     {
       path: "/my-page",
       iconOn: myPageOn,
@@ -35,7 +35,6 @@ const Navbar = () => {
             src={location.pathname === tab.path ? tab.iconOn : tab.iconOff}
             alt={tab.label}
           />
-          <span>{tab.label}</span>
         </S.TabButton>
       ))}
     </S.NavbarContainer>
