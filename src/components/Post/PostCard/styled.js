@@ -3,18 +3,23 @@ import styled from "styled-components";
 export const Card = styled.div`
   background: white;
   border-radius: 8px;
-  padding: 12px;
-  margin-bottom: 16px;
-  position: relative;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
+  height: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 `;
 
 export const ImageContainer = styled.div`
   width: 100%;
-  height: 200px;
-  border-radius: 8px;
+  height: 120px;
   overflow: hidden;
-  background-color: #f5f5f5;
-  margin-bottom: 12px;
+  border-radius: 4px;
 
   img {
     width: 100%;
@@ -24,30 +29,59 @@ export const ImageContainer = styled.div`
 `;
 
 export const Title = styled.h3`
-  font-size: 1rem;
-  font-weight: 500;
-  margin: 0 0 8px 0;
-  color: #333;
-`;
-
-export const Price = styled.p`
-  font-size: 1.1rem;
+  font-size: 16px;
   font-weight: 600;
   margin: 0;
-  color: #000;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  height: auto;
+  word-break: break-all;
+`;
+
+export const ModelName = styled.p`
+  font-size: 14px;
+  color: #666;
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-break: break-all;
+`;
+
+export const PriceRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+`;
+
+export const Price = styled.span`
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 export const ScrapButton = styled.button`
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
   background: none;
   border: none;
-  padding: 8px;
+  padding: 4px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   img {
     width: 24px;
     height: 24px;
+  }
+
+  &:hover {
+    opacity: 0.8;
   }
 `;

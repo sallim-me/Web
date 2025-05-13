@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as S from "./styled";
-import Input from "../../components/Input/Input";
-import Button from "../../components/common/Button/Button";
+import Input from "../../../components/Input/Input";
+import Button from "../../../components/common/Button/Button";
 
 const Login = () => {
   const navigate = useNavigate();

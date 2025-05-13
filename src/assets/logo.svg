@@ -1,1 +1,20 @@
- 
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 메인 텍스트 -->
+  <text x="40" y="28" font-family="Arial" font-weight="700" font-size="24" fill="#333333">살림</text>
+  
+  <!-- 아이콘: 재활용과 가전제품을 상징하는 심볼 -->
+  <g transform="translate(8, 8)">
+    <!-- 재활용 화살표 원 -->
+    <path d="M12 24C18.6274 24 24 18.6274 24 12C24 5.37258 18.6274 0 12 0C5.37258 0 0 5.37258 0 12C0 18.6274 5.37258 24 12 24Z" fill="#9FB3DF"/>
+    
+    <!-- 가전제품 실루엣 -->
+    <path d="M16 8H8C7.44772 8 7 8.44772 7 9V15C7 15.5523 7.44772 16 8 16H16C16.5523 16 17 15.5523 17 15V9C17 8.44772 16.5523 8 16 8Z" fill="white"/>
+    
+    <!-- 재활용 화살표 -->
+    <path d="M12 6V9L15 7.5L12 6ZM12 18V15L9 16.5L12 18ZM6 12H9L7.5 9L6 12ZM18 12H15L16.5 15L18 12Z" fill="white"/>
+  </g>
+  
+  <!-- 태그라인 -->
+  <text x="40" y="38" font-family="Arial" font-size="10" fill="#666666">중고가전 거래</text>
+</svg> 

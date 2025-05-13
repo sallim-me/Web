@@ -3,11 +3,12 @@ import styled from "styled-components";
 export const SignUpContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  padding: 0;
+  padding: 60px 0 0 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  background-color: white;
 `;
 
 export const Form = styled.form`
