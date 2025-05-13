@@ -4,6 +4,7 @@ import * as S from "./styled";
 import PostCard from "../../../components/Post/PostCard/PostCard";
 import Header from "../../../components/common/Header/Header";
 import Navbar from "../../../components/common/Navbar/Navbar";
+import Pagination from "../../../components/common/Pagination/Pagination";
 import refrigeratorIcon from "../../../assets/refrigerator.svg";
 import washerIcon from "../../../assets/washer.svg";
 import airconditionerIcon from "../../../assets/airconditioner.svg";
@@ -12,6 +13,8 @@ const PostList = () => {
   const navigate = useNavigate();
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const postsPerPage = 10;
 
   const categories = ["냉장고", "에어컨", "세탁기"];
   const statusOptions = [
@@ -170,6 +173,16 @@ const PostList = () => {
     return categoryMatch && statusMatch;
   });
 
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+  const startIndex = (currentPage - 1) * postsPerPage;
+  const endIndex = startIndex + postsPerPage;
+  const currentPosts = filteredPosts.slice(startIndex, endIndex);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <>
       <Header />
@@ -201,7 +214,7 @@ const PostList = () => {
         </S.FilterSection>
 
         <S.PostGrid>
-          {filteredPosts.map((post) => (
+          {currentPosts.map((post) => (
             <PostCard
               key={post.id}
               {...post}
@@ -214,6 +227,14 @@ const PostList = () => {
             />
           ))}
         </S.PostGrid>
+
+        {totalPages > 1 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        )}
 
         <S.AddButton onClick={() => navigate("/post/create")}>+</S.AddButton>
       </S.Container>
