@@ -111,7 +111,7 @@ export const MessageContent = styled.div`
   padding: 12px 16px;
   border-radius: 16px;
   border-bottom-${(props) => (props.isMine ? "right" : "left")}-radius: 4px;
-  max-width: 75%;
+  max-width: 100%;
   word-break: break-word;
   border: 1px solid ${(props) => (props.isMine ? "#9EC6F3" : "#BDDDE4")};
 `;

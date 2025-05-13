@@ -42,7 +42,9 @@ const Login = () => {
           value={formData.password}
           onChange={handleChange}
         />
-        <Button type="submit">로그인</Button>
+        <Button type="submit" variant="primary">
+          로그인
+        </Button>
         <Button
           type="button"
           variant="secondary"
