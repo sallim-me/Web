@@ -68,5 +68,10 @@ export const NicknameStatus = styled.p`
   margin-top: 0.15rem;
   padding-left: 0;
   text-align: left;
-  color: ${(props) => (props.isAvailable ? "#9FB3DF" : "#FF6B6B")};
+  color: ${(props) =>
+    props.isAvailable === null
+      ? "#999"
+      : props.isAvailable === true
+      ? "#9FB3DF"
+      : "#FF6B6B"};
 `;

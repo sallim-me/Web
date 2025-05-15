@@ -34,3 +34,11 @@ export const LinkButton = styled.button`
     color: #333;
   }
 `;
+
+export const ErrorMessage = styled.div`
+  color: #ff4d4f;
+  font-size: 14px;
+  margin-top: -0.5rem;
+  text-align: center;
+  width: 100%;
+`;

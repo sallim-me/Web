@@ -1,4 +1,4 @@
-import React from "react";
+import { React, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import * as S from "./styled";
 import chatOn from "../../../assets/chat-on.svg";
@@ -11,6 +11,10 @@ import myPageOff from "../../../assets/my-page-off.svg";
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const tabs = [
     { path: "/chat", iconOn: chatOn, iconOff: chatOff, label: "채팅" },

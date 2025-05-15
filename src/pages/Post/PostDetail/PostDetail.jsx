@@ -4,6 +4,7 @@ import * as S from "./styled";
 import scrapOnIcon from "../../../assets/scrap-on.svg";
 import scrapOffIcon from "../../../assets/scrap-off.svg";
 import backIcon from "../../../assets/back.svg";
+import Button from "../../../components/common/Button/Button";
 // import { ReactComponent as EditIcon } from "../../assets/icons/edit.svg";
 // import { ReactComponent as DeleteIcon } from "../../assets/icons/delete.svg";
 
@@ -12,6 +13,7 @@ const PostDetail = () => {
   const { id } = useParams();
   const [comment, setComment] = useState("");
   const [comments, setComments] = useState([]);
+  const [postStatus, setPostStatus] = useState("available"); // 'available' 또는 'sold'
 
   // Mock data - 실제로는 API에서 받아와야 함
   const savedPosts = localStorage.getItem("posts");
@@ -49,10 +51,6 @@ const PostDetail = () => {
     createdAt: new Date().toISOString(),
   };
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   const [isScraped, setIsScraped] = useState(post.isScraped || false);
 
   const getRandomColor = () => {
@@ -80,6 +78,17 @@ const PostDetail = () => {
     );
     localStorage.setItem("posts", JSON.stringify(updatedPosts));
     setIsScraped(!isScraped);
+  };
+
+  const handleStatusChange = () => {
+    const newStatus = postStatus === "available" ? "sold" : "available";
+    setPostStatus(newStatus);
+
+    // 실제로는 API 호출로 상태를 변경해야 함
+    const updatedPosts = posts.map((p) =>
+      p.id === Number(id) ? { ...p, status: newStatus } : p
+    );
+    localStorage.setItem("posts", JSON.stringify(updatedPosts));
   };
 
   //   const handleEdit = () => {
@@ -147,9 +156,24 @@ const PostDetail = () => {
               </S.ProfileInitial>
               <S.Author>{post.author}</S.Author>
             </S.AuthorInfo>
-            <S.ChatButton onClick={() => navigate(`/chat/${post.authorId}`)}>
-              채팅하기
-            </S.ChatButton>
+            {post.isAuthor ? (
+              <Button
+                variant={postStatus === "available" ? "primary" : "secondary"}
+                $width={postStatus === "available" ? "20%" : "30%"}
+                $padding="5px"
+                $fontSize="0.8rem"
+                onClick={handleStatusChange}
+              >
+                {postStatus === "available" ? "판매 완료" : "판매중으로 변경"}
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                onClick={() => navigate(`/chat/${post.authorId}`)}
+              >
+                채팅하기
+              </Button>
+            )}
           </S.AuthorSection>
 
           <S.SpecificationSection>
@@ -197,7 +221,9 @@ const PostDetail = () => {
               maxLength={1000}
               placeholder="댓글을 입력하세요 (최대 1000자)"
             />
-            <S.CommentButton type="submit">등록</S.CommentButton>
+            <Button type="submit" variant="primary" $width="25%">
+              등록
+            </Button>
           </S.CommentForm>
           <S.CommentList>
             {comments.map((comment) => (
@@ -210,11 +236,14 @@ const PostDetail = () => {
                 </S.CommentHeader>
                 <S.CommentContent>{comment.content}</S.CommentContent>
                 {comment.author === "현재 사용자" && (
-                  <S.CommentDeleteButton
+                  <Button
+                    variant="secondary"
+                    $width="20%"
+                    $padding="1px"
                     onClick={() => handleCommentDelete(comment.id)}
                   >
                     삭제
-                  </S.CommentDeleteButton>
+                  </Button>
                 )}
               </S.CommentItem>
             ))}

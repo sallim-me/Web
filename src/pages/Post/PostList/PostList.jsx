@@ -5,6 +5,7 @@ import PostCard from "../../../components/Post/PostCard/PostCard";
 import Header from "../../../components/common/Header/Header";
 import Navbar from "../../../components/common/Navbar/Navbar";
 import Pagination from "../../../components/common/Pagination/Pagination";
+import Button from "../../../components/common/Button/Button";
 import refrigeratorIcon from "../../../assets/refrigerator.svg";
 import washerIcon from "../../../assets/washer.svg";
 import airconditionerIcon from "../../../assets/airconditioner.svg";
@@ -44,7 +45,6 @@ const PostList = () => {
     );
   };
 
-  // 초기 게시물 데이터
   const initialPosts = [
     {
       id: 1,
@@ -173,7 +173,7 @@ const PostList = () => {
     return categoryMatch && statusMatch;
   });
 
-  // Pagination calculations
+  // Pagination
   const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
   const startIndex = (currentPage - 1) * postsPerPage;
   const endIndex = startIndex + postsPerPage;
@@ -190,53 +190,92 @@ const PostList = () => {
         <S.FilterSection>
           <S.CategoryGroup>
             {categories.map((category) => (
-              <S.FilterButton
+              <Button
                 key={category}
-                isActive={selectedCategories.includes(category)}
+                variant="secondary"
+                $width="80px"
+                $padding="6px 12px"
+                style={{
+                  background: selectedCategories.includes(category)
+                    ? "#9FB3DF"
+                    : "white",
+                  color: selectedCategories.includes(category)
+                    ? "white"
+                    : "#666",
+                  border: selectedCategories.includes(category)
+                    ? "1px solid #9FB3DF"
+                    : "1px solid #bddde4",
+                  fontSize: "13px",
+                  borderRadius: "16px",
+                  marginRight: "6px",
+                }}
                 onClick={() => toggleCategory(category)}
               >
                 {category}
-              </S.FilterButton>
+              </Button>
             ))}
           </S.CategoryGroup>
-          <S.Divider />
           <S.StatusGroup>
             {statusOptions.map((option) => (
-              <S.FilterButton
+              <Button
                 key={option.value}
-                isActive={selectedStatus === option.value}
+                variant="secondary"
+                $width="90px"
+                $padding="6px 12px"
+                style={{
+                  background:
+                    selectedStatus === option.value ? "#9FB3DF" : "white",
+                  color: selectedStatus === option.value ? "white" : "#666",
+                  border:
+                    selectedStatus === option.value
+                      ? "1px solid #9FB3DF"
+                      : "1px solid #bddde4",
+                  fontSize: "13px",
+                  borderRadius: "16px",
+                  marginRight: "6px",
+                }}
                 onClick={() => setSelectedStatus(option.value)}
               >
                 {option.label}
-              </S.FilterButton>
+              </Button>
             ))}
           </S.StatusGroup>
         </S.FilterSection>
-
+        <S.Divider />
         <S.PostGrid>
           {currentPosts.map((post) => (
             <PostCard
               key={post.id}
               {...post}
               onScrapClick={() => handleScrap(post.id)}
-              onClick={() => {
-                if (post.id) {
-                  navigate(`/post/detail/${post.id}`);
-                }
-              }}
+              onClick={() => navigate(`/post/detail/${post.id}`)}
             />
           ))}
         </S.PostGrid>
-
-        {totalPages > 1 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={handlePageChange}
-          />
-        )}
-
-        <S.AddButton onClick={() => navigate("/post/create")}>+</S.AddButton>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
+        <Button
+          variant="primary"
+          $width="48px"
+          $padding="0"
+          style={{
+            position: "fixed",
+            right: "16px",
+            bottom: "76px",
+            width: "48px",
+            height: "48px",
+            borderRadius: "24px",
+            fontSize: "24px",
+            zIndex: 100,
+            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          }}
+          onClick={() => navigate("/post/create")}
+        >
+          +
+        </Button>
       </S.Container>
       <Navbar />
     </>

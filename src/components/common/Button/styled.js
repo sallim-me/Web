@@ -8,7 +8,7 @@ export const Button = styled.button`
   color: ${(props) => (props.variant === "secondary" ? "#9FB3DF" : "white")};
   border: 2px solid #9fb3df;
   border-radius: 12px;
-  font-size: 1.1rem;
+  font-size: ${(props) => props.$fontSize || "1.1rem"};
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;

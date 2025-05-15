@@ -57,7 +57,7 @@ export const FilterButton = styled.button`
 
 export const PostGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   width: 100%;
   box-sizing: border-box;

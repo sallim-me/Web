@@ -36,8 +36,7 @@ const SignUp = () => {
     if (formData.nickname) {
       nicknameTimeoutRef.current = setTimeout(() => {
         // 실제로는 API 호출로 중복 확인
-        // 임시로 랜덤하게 결정
-        const isAvailable = Math.random() > 0.5;
+        const isAvailable = true;
         setIsNicknameAvailable(isAvailable);
       }, 1000);
     }
@@ -54,6 +53,11 @@ const SignUp = () => {
 
     if (!formData.username) newErrors.username = "아이디를 입력해주세요";
     if (!formData.password) newErrors.password = "비밀번호를 입력해주세요";
+    if (!formData.passwordCheck) {
+      newErrors.passwordCheck = "비밀번호 확인을 입력해주세요";
+    } else if (formData.password !== formData.passwordCheck) {
+      newErrors.passwordCheck = "비밀번호가 일치하지 않습니다";
+    }
     if (!formData.name) newErrors.name = "이름을 입력해주세요";
     if (!formData.nickname) newErrors.nickname = "닉네임을 입력해주세요";
     if (formData.nickname.length > 10)
@@ -68,7 +72,6 @@ const SignUp = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (validateForm()) {
-      // 회원가입 처리 로직
       console.log("회원가입 성공:", formData);
       navigate("/login");
     }
