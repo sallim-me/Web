@@ -31,7 +31,6 @@ export const ProfileSection = styled.div`
   align-items: center;
   padding: 24px 16px;
   background-color: #fff;
-  border-bottom: 1px solid #eee;
 `;
 
 export const ProfileImage = styled.div`

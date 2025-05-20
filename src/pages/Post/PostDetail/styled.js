@@ -158,20 +158,6 @@ export const Author = styled.span`
   font-weight: 500;
 `;
 
-export const ChatButton = styled.button`
-  background-color: #4a90e2;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #357abd;
-  }
-`;
-
 export const Label = styled.h2`
   font-size: 18px;
   font-weight: 600;
@@ -206,34 +192,6 @@ export const DefectGrid = styled.div`
 `;
 
 export const DefectItem = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-
-  span:first-child {
-    font-size: 14px;
-    color: #666;
-  }
-
-  span:last-child {
-    font-size: 14px;
-    color: #333;
-  }
-`;
-
-export const SellingInfoSection = styled.div`
-  padding: 16px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-`;
-
-export const SellingInfoGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-`;
-
-export const SellingInfoItem = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -290,21 +248,6 @@ export const CommentInput = styled.textarea`
   }
 `;
 
-export const CommentButton = styled.button`
-  background-color: #4a90e2;
-  color: white;
-  border: none;
-  padding: 0 16px;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  align-self: flex-end;
-
-  &:hover {
-    background-color: #357abd;
-  }
-`;
-
 export const CommentList = styled.div`
   display: flex;
   flex-direction: column;
@@ -341,20 +284,4 @@ export const CommentContent = styled.p`
   line-height: 1.5;
   color: #333;
   margin: 0;
-`;
-
-export const CommentDeleteButton = styled.button`
-  position: absolute;
-  right: 8px;
-  bottom: 8px;
-  background: none;
-  border: none;
-  color: #ff4444;
-  font-size: 12px;
-  cursor: pointer;
-  padding: 4px 8px;
-
-  &:hover {
-    text-decoration: underline;
-  }
 `;

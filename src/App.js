@@ -10,7 +10,9 @@ import ScrappedPosts from "./pages/My/ScrappedPosts/ScrappedPosts";
 import PostList from "./pages/Post/PostList/PostList";
 import PostCreate from "./pages/Post/PostCreate/PostCreate";
 import PostDetail from "./pages/Post/PostDetail/PostDetail";
+import PostModify from "./pages/Post/PostModify/PostModify";
 import MobileLayout from "./components/common/MobileLayout/MobileLayout";
+import Alarm from "./pages/Alarm/Alarm";
 
 const App = () => {
   // 임시로 로그인 상태를 확인하는 함수
@@ -28,11 +30,13 @@ const App = () => {
           <Route path="/post/list" element={<PostList />} />
           <Route path="/post/create" element={<PostCreate />} />
           <Route path="/post/detail/:id" element={<PostDetail />} />
+          <Route path="/post/modify/:id" element={<PostModify />} />
           <Route path="/chat" element={<ChatList />} />
           <Route path="/chat/:chatId" element={<ChatRoom />} />
           <Route path="/my-page" element={<MyPage />} />
           <Route path="/my-page/my-posts" element={<MyPosts />} />
           <Route path="/my-page/scrapped" element={<ScrappedPosts />} />
+          <Route path="/alarm" element={<Alarm />} />
         </Routes>
       </MobileLayout>
     </BrowserRouter>
