@@ -13,15 +13,16 @@ import airconditionerIcon from "../../../assets/airconditioner.svg";
 const PostList = () => {
   const navigate = useNavigate();
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 10;
 
   const categories = ["냉장고", "에어컨", "세탁기"];
   const statusOptions = [
-    { value: "all", label: "전체 상태" },
-    { value: "available", label: "판매중" },
-    { value: "sold", label: "판매완료" },
+    { value: "available_sell", label: "판매중" },
+    { value: "sold_sell", label: "판매완료" },
+    { value: "available_buy", label: "구매중" },
+    { value: "sold_buy", label: "구매완료" },
   ];
 
   const getImageForCategory = (category) => {
@@ -45,6 +46,14 @@ const PostList = () => {
     );
   };
 
+  const toggleStatus = (status) => {
+    setSelectedStatuses((prev) =>
+      prev.includes(status)
+        ? prev.filter((s) => s !== status)
+        : [...prev, status]
+    );
+  };
+
   const initialPosts = [
     {
       id: 1,
@@ -55,6 +64,7 @@ const PostList = () => {
       isScraped: false,
       category: "냉장고",
       status: "available",
+      type: "sell",
     },
     {
       id: 2,
@@ -65,6 +75,7 @@ const PostList = () => {
       isScraped: true,
       category: "세탁기",
       status: "available",
+      type: "sell",
     },
     {
       id: 3,
@@ -75,6 +86,7 @@ const PostList = () => {
       isScraped: false,
       category: "에어컨",
       status: "available",
+      type: "sell",
     },
     {
       id: 4,
@@ -85,36 +97,55 @@ const PostList = () => {
       isScraped: true,
       category: "세탁기",
       status: "sold",
+      type: "sell",
     },
     {
       id: 5,
-      title: "[판매] 삼성 비스포크 냉장고",
+      title: "[구매] 삼성 비스포크 냉장고 구매",
       modelName: "SD86X645",
       price: 1200000,
       imageUrl: refrigeratorIcon,
       isScraped: false,
       category: "냉장고",
       status: "available",
+      type: "buy",
+      buyingInfo: {
+        quantity: "1",
+        desiredPrice: "1200000",
+        condition: "새제품",
+      },
     },
     {
       id: 6,
-      title: "[판매] 벽걸이 에어컨 판매",
+      title: "[구매] 벽걸이 에어컨 구매",
       modelName: "QPLM4577",
       price: 280000,
       imageUrl: airconditionerIcon,
       isScraped: false,
       category: "에어컨",
       status: "available",
+      type: "buy",
+      buyingInfo: {
+        quantity: "1",
+        desiredPrice: "280000",
+        condition: "중고",
+      },
     },
     {
       id: 7,
-      title: "[판매] LG 트롬 세탁기",
+      title: "[구매] LG 트롬 세탁기 구매",
       modelName: "SPEQXF4",
       price: 450000,
       imageUrl: washerIcon,
       isScraped: true,
       category: "세탁기",
-      status: "available",
+      status: "sold",
+      type: "buy",
+      buyingInfo: {
+        quantity: "1",
+        desiredPrice: "450000",
+        condition: "중고",
+      },
     },
     {
       id: 8,
@@ -125,6 +156,7 @@ const PostList = () => {
       isScraped: false,
       category: "냉장고",
       status: "available",
+      type: "sell",
     },
   ];
 
@@ -138,13 +170,18 @@ const PostList = () => {
       author: post.author || "현재 사용자",
       authorId: post.authorId || "current-user",
       isAuthor: post.isAuthor ?? true,
-      type: post.type || "sell",
+      type: post.type || (post.title.startsWith("[구매]") ? "buy" : "sell"),
       status: post.status || "available",
       specifications: post.specifications || "",
       defectQuestions: post.defectQuestions || {
         cooling: "정상",
         noise: "정상",
         exterior: "정상",
+      },
+      buyingInfo: post.buyingInfo || {
+        quantity: "",
+        desiredPrice: "",
+        condition: "",
       },
     }));
 
@@ -168,8 +205,14 @@ const PostList = () => {
     const categoryMatch =
       selectedCategories.length === 0 ||
       selectedCategories.includes(post.category);
+
     const statusMatch =
-      selectedStatus === "all" || post.status === selectedStatus;
+      selectedStatuses.length === 0 ||
+      selectedStatuses.some((selectedStatus) => {
+        const [status, type] = selectedStatus.split("_");
+        return post.status === status && post.type === type;
+      });
+
     return categoryMatch && statusMatch;
   });
 
@@ -192,9 +235,8 @@ const PostList = () => {
             {categories.map((category) => (
               <Button
                 key={category}
-                variant="secondary"
-                $width="80px"
-                $padding="6px 12px"
+                size="small"
+                variant="2"
                 style={{
                   background: selectedCategories.includes(category)
                     ? "#9FB3DF"
@@ -219,22 +261,25 @@ const PostList = () => {
             {statusOptions.map((option) => (
               <Button
                 key={option.value}
-                variant="secondary"
+                size="small"
+                variant="2"
                 $width="90px"
                 $padding="6px 12px"
                 style={{
-                  background:
-                    selectedStatus === option.value ? "#9FB3DF" : "white",
-                  color: selectedStatus === option.value ? "white" : "#666",
-                  border:
-                    selectedStatus === option.value
-                      ? "1px solid #9FB3DF"
-                      : "1px solid #bddde4",
+                  background: selectedStatuses.includes(option.value)
+                    ? "#9FB3DF"
+                    : "white",
+                  color: selectedStatuses.includes(option.value)
+                    ? "white"
+                    : "#666",
+                  border: selectedStatuses.includes(option.value)
+                    ? "1px solid #9FB3DF"
+                    : "1px solid #bddde4",
                   fontSize: "13px",
                   borderRadius: "16px",
                   marginRight: "6px",
                 }}
-                onClick={() => setSelectedStatus(option.value)}
+                onClick={() => toggleStatus(option.value)}
               >
                 {option.label}
               </Button>
@@ -249,6 +294,7 @@ const PostList = () => {
               {...post}
               onScrapClick={() => handleScrap(post.id)}
               onClick={() => navigate(`/post/detail/${post.id}`)}
+              style={{ maxWidth: "400px" }}
             />
           ))}
         </S.PostGrid>
@@ -271,6 +317,9 @@ const PostList = () => {
             fontSize: "24px",
             zIndex: 100,
             boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
           }}
           onClick={() => navigate("/post/create")}
         >

@@ -42,12 +42,13 @@ const Login = () => {
           value={formData.password}
           onChange={handleChange}
         />
-        <Button type="submit" variant="primary">
+        <Button type="submit" size="big" variant="1">
           로그인
         </Button>
         <Button
           type="button"
-          variant="secondary"
+          size="big"
+          variant="2"
           onClick={() => navigate("/signup")}
         >
           회원가입

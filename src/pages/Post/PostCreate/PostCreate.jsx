@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import backIcon from "../../../assets/back.svg";
 import {
   Container,
   Form,
@@ -19,7 +20,11 @@ import refrigeratorIcon from "../../../assets/refrigerator.svg";
 import washerIcon from "../../../assets/washer.svg";
 import airconditionerIcon from "../../../assets/airconditioner.svg";
 
-const PostCreate = () => {
+const PostCreate = ({
+  isEditMode = false,
+  initialData = null,
+  postId = null,
+}) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
@@ -31,7 +36,37 @@ const PostCreate = () => {
     defectAnswers: {},
     description: "",
     price: "",
+    buyingInfo: { quantity: "", desiredPrice: "", condition: "" },
   });
+
+  useEffect(() => {
+    if (initialData) {
+      const cleanTitle = initialData.title.replace(
+        /^\[(판매|판매완료|구매|구매완료)\] /,
+        ""
+      );
+
+      // 이미지를 { url: string, file: File | null } 형태로 변환하여 상태에 설정
+      const initialImages = Array.isArray(initialData.images)
+        ? initialData.images.map((img) => ({ url: img.url || img, file: null })) // 기존 이미지는 file: null
+        : initialData.imageUrl
+        ? [{ url: initialData.imageUrl, file: null }]
+        : []; // imageUrl만 있는 경우 처리
+
+      setFormData({
+        ...formData,
+        ...initialData,
+        title: cleanTitle,
+        images: initialImages,
+        defectAnswers: initialData.defectAnswers || {},
+        buyingInfo: initialData.buyingInfo || {
+          quantity: "",
+          desiredPrice: "",
+          condition: "",
+        },
+      });
+    }
+  }, [initialData]);
 
   const categories = ["냉장고", "세탁기", "에어컨"];
   const tradeTypes = ["판매", "구매"];
@@ -90,14 +125,68 @@ const PostCreate = () => {
       return;
     }
 
-    const newImages = files.map((file) => URL.createObjectURL(file));
+    const newImages = files.map((file) => ({
+      url: URL.createObjectURL(file),
+      file: file,
+    }));
+
     setFormData((prev) => ({
       ...prev,
       images: [...prev.images, ...newImages],
     }));
+
+    // 파일 인풋 초기화 (같은 파일 다시 선택 가능하게)
+    e.target.value = "";
+  };
+
+  const handleCameraCapture = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const video = document.createElement("video");
+      video.srcObject = stream;
+      await video.play();
+
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0);
+
+      // 스트림 정지
+      stream.getTracks().forEach((track) => track.stop());
+
+      // 캔버스를 Blob으로 변환
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const file = new File([blob], `camera_${Date.now()}.jpg`, {
+            type: "image/jpeg",
+          });
+          const newImage = {
+            url: URL.createObjectURL(blob),
+            file: file,
+          };
+
+          // 이미지 개수 제한 체크
+          if (formData.images.length >= 5) {
+            alert("최대 5장까지 업로드할 수 있습니다.");
+            return;
+          }
+
+          setFormData((prev) => ({
+            ...prev,
+            images: [...prev.images, newImage],
+          }));
+        }
+      }, "image/jpeg");
+    } catch (error) {
+      console.error("카메라 접근 오류:", error);
+      alert("카메라에 접근할 수 없습니다.");
+    }
   };
 
   const handleImageDelete = (index) => {
+    // 삭제 시 URL 해제 (메모리 누수 방지)
+    URL.revokeObjectURL(formData.images[index].url);
     setFormData((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
@@ -119,41 +208,96 @@ const PostCreate = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // 기존 게시물 가져오기
     const savedPosts = localStorage.getItem("posts");
     const posts = savedPosts ? JSON.parse(savedPosts) : [];
 
-    // 새 게시물 데이터 생성
-    const newPost = {
-      id: Date.now(),
-      title: `[${formData.tradeType}] ${formData.title}`,
-      modelName: formData.modelName,
-      price: Number(formData.price),
-      imageUrl: getImageForCategory(formData.category),
-      isScraped: false,
-      category: formData.category,
-      status: "available",
-      author: "현재 사용자",
-      authorId: "current-user",
-      isAuthor: true,
-      type: formData.tradeType === "판매" ? "sell" : "buy",
-      specifications: formData.specifications,
-      defectAnswers: formData.defectAnswers,
-      description: formData.description,
-      createdAt: new Date().toISOString(),
-    };
+    // 저장 시 file 객체는 제외하고 url만 저장
+    const imagesToSave = formData.images.map((img) => img.url);
 
-    // 새 게시물을 기존 게시물 배열에 추가
-    const updatedPosts = [newPost, ...posts];
-    localStorage.setItem("posts", JSON.stringify(updatedPosts));
-
-    // 게시물 목록 페이지로 이동
-    navigate("/post/list");
+    if (isEditMode && postId) {
+      // 수정 모드: 해당 글만 업데이트
+      const updatedPosts = posts.map((p) =>
+        p.id === Number(postId)
+          ? {
+              ...p,
+              title: `[${formData.tradeType}] ${formData.title}`,
+              modelName: formData.modelName,
+              price: Number(formData.price),
+              images: imagesToSave,
+              imageUrl:
+                imagesToSave.length > 0
+                  ? imagesToSave[0]
+                  : getImageForCategory(formData.category),
+              category: formData.category,
+              specifications: formData.specifications,
+              defectAnswers: formData.defectAnswers,
+              description: formData.description,
+              buyingInfo: formData.buyingInfo,
+            }
+          : p
+      );
+      localStorage.setItem("posts", JSON.stringify(updatedPosts));
+      navigate(`/post/detail/${postId}`);
+    } else {
+      // 생성 모드
+      const newPost = {
+        id: Date.now(),
+        title: `[${formData.tradeType}] ${formData.title}`,
+        modelName: formData.modelName,
+        price: Number(formData.price),
+        images: imagesToSave,
+        imageUrl:
+          imagesToSave.length > 0
+            ? imagesToSave[0]
+            : getImageForCategory(formData.category),
+        isScraped: false,
+        category: formData.category,
+        status: "available",
+        author: "현재 사용자",
+        authorId: "current-user",
+        isAuthor: true,
+        type: formData.tradeType === "판매" ? "sell" : "buy",
+        specifications: formData.specifications,
+        defectAnswers: formData.defectAnswers,
+        description: formData.description,
+        createdAt: new Date().toISOString(),
+        buyingInfo: formData.buyingInfo,
+      };
+      const updatedPosts = [newPost, ...posts];
+      localStorage.setItem("posts", JSON.stringify(updatedPosts));
+      navigate("/post/list");
+    }
   };
 
   return (
     <Container>
+      <div
+        style={{
+          height: 56,
+          display: "flex",
+          alignItems: "center",
+          padding: "0 16px",
+          background: "none",
+        }}
+      >
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            background: "none",
+            border: "none",
+            padding: 8,
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <img
+            src={backIcon}
+            alt="뒤로 가기"
+            style={{ width: 28, height: 28 }}
+          />
+        </button>
+      </div>
       <Form onSubmit={handleSubmit}>
         <Section>
           <Label>제목</Label>
@@ -166,22 +310,27 @@ const PostCreate = () => {
             required
           />
         </Section>
-
         <Section>
           <Label>거래 유형</Label>
-          <Select
-            name="tradeType"
-            value={formData.tradeType}
-            onChange={handleChange}
-            required
-          >
-            <option value="">선택하세요</option>
-            {tradeTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </Select>
+          {isEditMode ? (
+            <div style={{ padding: "8px 12px", fontSize: "16px" }}>
+              {formData.tradeType}
+            </div>
+          ) : (
+            <Select
+              name="tradeType"
+              value={formData.tradeType}
+              onChange={handleChange}
+              required
+            >
+              <option value="">선택하세요</option>
+              {tradeTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </Select>
+          )}
         </Section>
 
         {formData.tradeType && (
@@ -207,16 +356,23 @@ const PostCreate = () => {
               <>
                 <Section>
                   <Label>제품 사진 (최대 5장)</Label>
-                  <ImageUploadButton>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImageUpload}
-                      style={{ display: "none" }}
-                    />
-                    <span>클릭하여 사진 업로드</span>
-                  </ImageUploadButton>
+                  <div
+                    style={{ display: "flex", gap: "8px", marginBottom: "8px" }}
+                  >
+                    <ImageUploadButton>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleImageUpload}
+                        style={{ display: "none" }}
+                      />
+                      <span>갤러리에서 선택</span>
+                    </ImageUploadButton>
+                    <ImageUploadButton onClick={handleCameraCapture}>
+                      <span>카메라로 촬영</span>
+                    </ImageUploadButton>
+                  </div>
                   {formData.images.length > 0 && (
                     <div
                       style={{
@@ -243,7 +399,7 @@ const PostCreate = () => {
                       {formData.images.map((image, index) => (
                         <div key={index} style={{ position: "relative" }}>
                           <img
-                            src={image}
+                            src={image.url}
                             alt={`Preview ${index + 1}`}
                             style={{
                               width: "80px",
@@ -312,70 +468,72 @@ const PostCreate = () => {
 
                 {formData.category && (
                   <>
-                    {formData.tradeType === "판매" && (
-                      <Section>
-                        <Label>제품 상태</Label>
-                        <QuestionBox>
-                          {defectQuestions[formData.category].map(
-                            (question, index) => (
-                              <div
-                                key={index}
-                                style={{
-                                  marginBottom:
-                                    index !==
-                                    defectQuestions[formData.category].length -
-                                      1
-                                      ? "16px"
-                                      : "0",
-                                }}
-                              >
-                                <Question>{question}</Question>
-                                <RadioGroup>
-                                  <label>
-                                    <input
-                                      type="radio"
-                                      name={`defect_${index}`}
-                                      value="yes"
-                                      onChange={() =>
-                                        handleDefectQuestionChange(
-                                          question,
+                    {formData.tradeType === "판매" &&
+                      defectQuestions[formData.category] && (
+                        <Section>
+                          <Label>제품 상태</Label>
+                          <QuestionBox>
+                            {defectQuestions[formData.category].map(
+                              (question, index) => (
+                                <div
+                                  key={index}
+                                  style={{
+                                    marginBottom:
+                                      index !==
+                                      defectQuestions[formData.category]
+                                        .length -
+                                        1
+                                        ? "16px"
+                                        : "0",
+                                  }}
+                                >
+                                  <Question>{question}</Question>
+                                  <RadioGroup>
+                                    <label>
+                                      <input
+                                        type="radio"
+                                        name={`defect_${index}`}
+                                        value="yes"
+                                        onChange={() =>
+                                          handleDefectQuestionChange(
+                                            question,
+                                            "yes"
+                                          )
+                                        }
+                                        checked={
+                                          formData.defectAnswers[question] ===
                                           "yes"
-                                        )
-                                      }
-                                      checked={
-                                        formData.defectAnswers[question] ===
-                                        "yes"
-                                      }
-                                      required={formData.tradeType === "판매"}
-                                    />
-                                    <span>예</span>
-                                  </label>
-                                  <label>
-                                    <input
-                                      type="radio"
-                                      name={`defect_${index}`}
-                                      value="no"
-                                      onChange={() =>
-                                        handleDefectQuestionChange(
-                                          question,
+                                        }
+                                        required={formData.tradeType === "판매"}
+                                      />
+                                      <span>예</span>
+                                    </label>
+                                    <label>
+                                      <input
+                                        type="radio"
+                                        name={`defect_${index}`}
+                                        value="no"
+                                        onChange={() =>
+                                          handleDefectQuestionChange(
+                                            question,
+                                            "no"
+                                          )
+                                        }
+                                        checked={
+                                          formData.defectAnswers[question] ===
                                           "no"
-                                        )
-                                      }
-                                      checked={
-                                        formData.defectAnswers[question] ===
-                                        "no"
-                                      }
-                                      required={formData.tradeType === "판매"}
-                                    />
-                                    <span>아니오</span>
-                                  </label>
-                                </RadioGroup>
-                              </div>
-                            )
-                          )}
-                        </QuestionBox>
-                      </Section>
-                    )}
+                                        }
+                                        required={formData.tradeType === "판매"}
+                                      />
+                                      <span>아니오</span>
+                                    </label>
+                                  </RadioGroup>
+                                </div>
+                              )
+                            )}
+                          </QuestionBox>
+                        </Section>
+                      )}
                   </>
                 )}
 

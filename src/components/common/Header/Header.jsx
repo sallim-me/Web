@@ -21,10 +21,7 @@ const Header = () => {
         <S.IconButton onClick={handleLogout}>
           <img src={logoutIcon} alt="로그아웃" />
         </S.IconButton>
-        <S.IconButton
-          $hasAlarm={hasAlarm}
-          onClick={() => navigate("/notification")}
-        >
+        <S.IconButton $hasAlarm={hasAlarm} onClick={() => navigate("/alarm")}>
           <img src={hasAlarm ? alarmOnIcon : alarmOffIcon} alt="알림" />
           {hasAlarm && <S.AlarmDot />}
         </S.IconButton>
