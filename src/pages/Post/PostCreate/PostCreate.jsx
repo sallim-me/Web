@@ -1,21 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import backIcon from "../../../assets/back.svg";
-import {
-  Container,
-  Form,
-  Section,
-  Label,
-  Input,
-  Select,
-  TextArea,
-  ImageUploadButton,
-  QuestionBox,
-  Question,
-  RadioGroup,
-  SubmitButton,
-  Divider,
-} from "./styled";
+import * as S from "./styled";
 import refrigeratorIcon from "../../../assets/refrigerator.svg";
 import washerIcon from "../../../assets/washer.svg";
 import airconditionerIcon from "../../../assets/airconditioner.svg";
@@ -141,7 +127,28 @@ const PostCreate = ({
 
   const handleCameraCapture = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      // HTTPS 체크 - 로컬호스트 예외 처리 개선
+      if (
+        window.location.protocol !== "https:" &&
+        !["localhost", "127.0.0.1"].includes(window.location.hostname)
+      ) {
+        alert(
+          "카메라 접근을 위해서는 HTTPS 연결이 필요합니다.\n\n" +
+            "개발 환경에서는 localhost에서 실행해주세요.\n" +
+            "실제 서비스에서는 HTTPS로 배포해야 합니다."
+        );
+        return;
+      }
+
+      // 카메라 접근 권한 요청
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "environment", // 후면 카메라 우선
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+        },
+      });
+
       const video = document.createElement("video");
       video.srcObject = stream;
       await video.play();
@@ -180,7 +187,19 @@ const PostCreate = ({
       }, "image/jpeg");
     } catch (error) {
       console.error("카메라 접근 오류:", error);
-      alert("카메라에 접근할 수 없습니다.");
+      if (error.name === "NotAllowedError") {
+        alert(
+          "카메라 접근 권한이 거부되었습니다. 브라우저 설정에서 카메라 접근을 허용해주세요."
+        );
+      } else if (error.name === "NotFoundError") {
+        alert(
+          "카메라를 찾을 수 없습니다. 기기에 카메라가 있는지 확인해주세요."
+        );
+      } else {
+        alert(
+          "카메라 접근 중 오류가 발생했습니다. 갤러리에서 사진을 선택해주세요."
+        );
+      }
     }
   };
 
@@ -270,7 +289,7 @@ const PostCreate = ({
   };
 
   return (
-    <Container>
+    <S.Container>
       <div
         style={{
           height: 56,
@@ -298,10 +317,10 @@ const PostCreate = ({
           />
         </button>
       </div>
-      <Form onSubmit={handleSubmit}>
-        <Section>
-          <Label>제목</Label>
-          <Input
+      <S.Form onSubmit={handleSubmit}>
+        <S.Section>
+          <S.Label>제목</S.Label>
+          <S.Input
             type="text"
             name="title"
             value={formData.title}
@@ -309,15 +328,15 @@ const PostCreate = ({
             placeholder="브랜드명, 제품명, 모델명을 포함해주세요"
             required
           />
-        </Section>
-        <Section>
-          <Label>거래 유형</Label>
+        </S.Section>
+        <S.Section>
+          <S.Label>거래 유형</S.Label>
           {isEditMode ? (
             <div style={{ padding: "8px 12px", fontSize: "16px" }}>
               {formData.tradeType}
             </div>
           ) : (
-            <Select
+            <S.Select
               name="tradeType"
               value={formData.tradeType}
               onChange={handleChange}
@@ -329,15 +348,15 @@ const PostCreate = ({
                   {type}
                 </option>
               ))}
-            </Select>
+            </S.Select>
           )}
-        </Section>
+        </S.Section>
 
         {formData.tradeType && (
           <>
-            <Section>
-              <Label>카테고리</Label>
-              <Select
+            <S.Section>
+              <S.Label>카테고리</S.Label>
+              <S.Select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
@@ -349,17 +368,17 @@ const PostCreate = ({
                     {category}
                   </option>
                 ))}
-              </Select>
-            </Section>
+              </S.Select>
+            </S.Section>
 
             {formData.tradeType === "판매" && (
               <>
-                <Section>
-                  <Label>제품 사진 (최대 5장)</Label>
+                <S.Section>
+                  <S.Label>제품 사진 (최대 5장)</S.Label>
                   <div
                     style={{ display: "flex", gap: "8px", marginBottom: "8px" }}
                   >
-                    <ImageUploadButton>
+                    <S.ImageUploadButton>
                       <input
                         type="file"
                         accept="image/*"
@@ -368,10 +387,10 @@ const PostCreate = ({
                         style={{ display: "none" }}
                       />
                       <span>갤러리에서 선택</span>
-                    </ImageUploadButton>
-                    <ImageUploadButton onClick={handleCameraCapture}>
+                    </S.ImageUploadButton>
+                    <S.ImageUploadButton onClick={handleCameraCapture}>
                       <span>카메라로 촬영</span>
-                    </ImageUploadButton>
+                    </S.ImageUploadButton>
                   </div>
                   {formData.images.length > 0 && (
                     <div
@@ -435,11 +454,11 @@ const PostCreate = ({
                       ))}
                     </div>
                   )}
-                </Section>
+                </S.Section>
 
-                <Section>
-                  <Label>모델명</Label>
-                  <Input
+                <S.Section>
+                  <S.Label>모델명</S.Label>
+                  <S.Input
                     type="text"
                     name="modelName"
                     value={formData.modelName}
@@ -452,11 +471,11 @@ const PostCreate = ({
                       overflowY: "auto",
                     }}
                   />
-                </Section>
+                </S.Section>
 
-                <Section>
-                  <Label>제품 사양</Label>
-                  <TextArea
+                <S.Section>
+                  <S.Label>제품 사양</S.Label>
+                  <S.TextArea
                     name="specifications"
                     value={formData.specifications}
                     onChange={handleChange}
@@ -464,15 +483,15 @@ const PostCreate = ({
                     required
                     style={{ minHeight: "120px" }}
                   />
-                </Section>
+                </S.Section>
 
                 {formData.category && (
                   <>
                     {formData.tradeType === "판매" &&
                       defectQuestions[formData.category] && (
-                        <Section>
-                          <Label>제품 상태</Label>
-                          <QuestionBox>
+                        <S.Section>
+                          <S.Label>제품 상태</S.Label>
+                          <S.QuestionBox>
                             {defectQuestions[formData.category].map(
                               (question, index) => (
                                 <div
@@ -487,8 +506,8 @@ const PostCreate = ({
                                         : "0",
                                   }}
                                 >
-                                  <Question>{question}</Question>
-                                  <RadioGroup>
+                                  <S.Question>{question}</S.Question>
+                                  <S.RadioGroup>
                                     <label>
                                       <input
                                         type="radio"
@@ -527,30 +546,30 @@ const PostCreate = ({
                                       />
                                       <span>아니오</span>
                                     </label>
-                                  </RadioGroup>
+                                  </S.RadioGroup>
                                 </div>
                               )
                             )}
-                          </QuestionBox>
-                        </Section>
+                          </S.QuestionBox>
+                        </S.Section>
                       )}
                   </>
                 )}
 
-                <Section>
-                  <Label>상세 설명</Label>
-                  <TextArea
+                <S.Section>
+                  <S.Label>상세 설명</S.Label>
+                  <S.TextArea
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
                     placeholder="제품의 사용 기간, 상태, 하자 여부 등 상세한 정보를 입력해주세요"
                     required
                   />
-                </Section>
+                </S.Section>
 
-                <Section>
-                  <Label>가격</Label>
-                  <Input
+                <S.Section>
+                  <S.Label>가격</S.Label>
+                  <S.Input
                     type="number"
                     name="price"
                     value={formData.price}
@@ -558,15 +577,15 @@ const PostCreate = ({
                     placeholder="숫자만 입력"
                     required
                   />
-                </Section>
+                </S.Section>
               </>
             )}
 
             {formData.tradeType === "구매" && (
               <>
-                <Section>
-                  <Label>구매 정보</Label>
-                  <Input
+                <S.Section>
+                  <S.Label>구매 정보</S.Label>
+                  <S.Input
                     type="number"
                     name="buyingInfo.quantity"
                     value={formData.buyingInfo.quantity}
@@ -574,7 +593,7 @@ const PostCreate = ({
                     placeholder="수량(최소 3개)"
                     required
                   />
-                  <Input
+                  <S.Input
                     type="number"
                     name="buyingInfo.desiredPrice"
                     value={formData.buyingInfo.desiredPrice}
@@ -590,22 +609,22 @@ const PostCreate = ({
                     placeholder="마감 기한"
                     required
                   /> */}
-                  <TextArea
+                  <S.TextArea
                     name="buyingInfo.condition"
                     value={formData.buyingInfo.condition}
                     onChange={handleChange}
                     placeholder="제품 조건을 입력해주세요"
                     required
                   />
-                </Section>
+                </S.Section>
               </>
             )}
           </>
         )}
 
-        <SubmitButton type="submit">등록하기</SubmitButton>
-      </Form>
-    </Container>
+        <S.SubmitButton type="submit">등록하기</S.SubmitButton>
+      </S.Form>
+    </S.Container>
   );
 };
 

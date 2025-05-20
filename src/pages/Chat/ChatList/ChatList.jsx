@@ -2,19 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../../../components/common/Header/Header";
 import Navbar from "../../../components/common/Navbar/Navbar";
-import {
-  Container,
-  ChatListWrapper,
-  ChatItem,
-  ProfileCircle,
-  ChatInfo,
-  ChatTitleRow,
-  ChatTitle,
-  ChatTime,
-  ChatMeta,
-  ChatPreview,
-  UnreadDot,
-} from "./styled";
+import * as S from "./styled";
 import { chatRooms } from "../chatDummyData";
 
 const getInitial = (nickname) => nickname.charAt(0).toUpperCase();
@@ -22,26 +10,29 @@ const getInitial = (nickname) => nickname.charAt(0).toUpperCase();
 const ChatList = () => {
   const navigate = useNavigate();
   return (
-    <Container>
+    <S.Container>
       <Header />
-      <ChatListWrapper>
+      <S.ChatListWrapper>
         {chatRooms.map((chat) => (
-          <ChatItem key={chat.id} onClick={() => navigate(`/chat/${chat.id}`)}>
-            <ProfileCircle>{getInitial(chat.nickname)}</ProfileCircle>
-            <ChatInfo>
-              <ChatTitleRow>
-                <ChatTitle>{chat.nickname}</ChatTitle>
-                <ChatTime>{chat.lastTime}</ChatTime>
-                {chat.unread && <UnreadDot />}
-              </ChatTitleRow>
-              <ChatMeta>{chat.postTitle}</ChatMeta>
-              <ChatPreview>{chat.lastMessage}</ChatPreview>
-            </ChatInfo>
-          </ChatItem>
+          <S.ChatItem
+            key={chat.id}
+            onClick={() => navigate(`/chat/${chat.id}`)}
+          >
+            <S.ProfileCircle>{getInitial(chat.nickname)}</S.ProfileCircle>
+            <S.ChatInfo>
+              <S.ChatTitleRow>
+                <S.ChatTitle>{chat.nickname}</S.ChatTitle>
+                <S.ChatTime>{chat.lastTime}</S.ChatTime>
+                {chat.unread && <S.UnreadDot />}
+              </S.ChatTitleRow>
+              <S.ChatMeta>{chat.postTitle}</S.ChatMeta>
+              <S.ChatPreview>{chat.lastMessage}</S.ChatPreview>
+            </S.ChatInfo>
+          </S.ChatItem>
         ))}
-      </ChatListWrapper>
+      </S.ChatListWrapper>
       <Navbar />
-    </Container>
+    </S.Container>
   );
 };
 
