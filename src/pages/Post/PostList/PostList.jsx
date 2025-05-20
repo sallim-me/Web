@@ -238,6 +238,7 @@ const PostList = () => {
                 size="small"
                 variant="2"
                 style={{
+                  width: "20%",
                   background: selectedCategories.includes(category)
                     ? "#9FB3DF"
                     : "white",
@@ -266,6 +267,7 @@ const PostList = () => {
                 $width="90px"
                 $padding="6px 12px"
                 style={{
+                  width: "20%",
                   background: selectedStatuses.includes(option.value)
                     ? "#9FB3DF"
                     : "white",
